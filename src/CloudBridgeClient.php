@@ -72,7 +72,38 @@ class CloudBridgeClient
      */
     public function uploadFile($filePath, $folder)
     {
-        return $this->uploadFiles([$filePath], $folder);
+        if (!is_string($filePath)) {
+            throw new \InvalidArgumentException('File path must be a string.');
+        }
+
+        $file = $this->normalizePath($filePath);
+        if (!is_file($file)) {
+            throw new \InvalidArgumentException('File not found: ' . $filePath);
+        }
+
+        $headers = $this->buildAuthHeaders();
+
+        $mime = function_exists('mime_content_type') ? (mime_content_type($file) ?: 'application/octet-stream') : 'application/octet-stream';
+        /** @var array<string, mixed> $postFields */
+        $postFields = [
+            'folder' => (string)$folder,
+            // Send single file with the exact field name expected by the API: `files`
+            'files' => curl_file_create($file, $mime, basename($file)),
+        ];
+
+        list($statusCode, $body) = $this->sendMultipartRequest($this->baseUrl . self::UPLOAD_PATH, $headers, $postFields, $this->timeout);
+
+        $decoded = json_decode($body, true);
+        if (!is_array($decoded)) {
+            $decoded = ['success' => false, 'status' => 'error', 'message' => 'Invalid JSON response', 'raw' => $body];
+        }
+
+        $message = isset($decoded['message']) && is_string($decoded['message']) ? $decoded['message'] : '';
+        if ($statusCode === 401 || stripos($message, 'Invalid API credentials') !== false) {
+            throw new InvalidCredentialsException($message !== '' ? $message : 'Invalid API credentials');
+        }
+
+        return $decoded;
     }
 
     /**
