@@ -1,0 +1,35 @@
+{
+    "name": "nugitech/cloudbridge-php",
+    "description": "CloudBridge PHP SDK (upload API client)",
+    "type": "library",
+    "require": {
+        "php": ">=7.2",
+        "ext-curl": "*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nugitech",
+            "email": "opensource@nugitech.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CloudBridge\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CloudBridge\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5",
+        "phpstan/phpstan": "^1.10"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "php -l src/*.php",
+        "phpstan": "phpstan analyse"
+    }
+}
