@@ -5,7 +5,7 @@ Production-grade PHP SDK to upload files to CloudBridge using cURL.
 ## Install
 
 ```bash
-composer require nugitech/cloudbridge-php
+composer require nugitech/cloudbridge-php:dev-master
 ```
 
 ## Requirements
